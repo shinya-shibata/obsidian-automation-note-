@@ -7,13 +7,13 @@ from google import genai
 from google.genai import types
 from google.genai.errors import APIError
 
-client = genai.Client()
+client = genai.Client(api_key="AIzaSyBOqKWkL8bHVbOEKFPWF_VwHrzvogo3M6c")
 
 # 【新しい保存場所の設計】
 # 質問を書き込むフォルダ（処理待ち）
-QUEUE_FOLDER = "C:/Users/YourName/Documents/Obsidian/VaultName/01_Questions_Queue" 
+QUEUE_FOLDER = "C:/Users/user/Documents/Obsidian Vault/01_Questions_Queue" 
 # 処理が完了したノートの自動移動先（処理済み）
-ARCHIVE_FOLDER = "C:/Users/YourName/Documents/Obsidian/VaultName/02_Questions_Archive"
+ARCHIVE_FOLDER = "C:/Users/user/Documents/Obsidian Vault/02_Questions_Archive"
 
 def process_paragraph(paragraph: str) -> str:
     """1つの段落を解析し、Geminiに問い合わせて回答を追記します。"""
@@ -34,14 +34,14 @@ def process_paragraph(paragraph: str) -> str:
         return paragraph
 
     print(f"Geminiに問い合わせ中: {content[:30]}...")
-    prompt = content + "\n\n指示文：簡潔に専門的に解説してください。"
+    prompt = content + "\n\n指示文：の内容をわかりやすく解説してください。"
     
     max_retries = 3
     answer = ""
     for attempt in range(max_retries):
         try:
             response = client.models.generate_content(
-                model='gemini-2.5-flash',
+                model='gemini-3.5-flash',
                 contents=prompt,
                 config=types.GenerateContentConfig(
                     thinking_config=types.ThinkingConfig(
@@ -58,10 +58,10 @@ def process_paragraph(paragraph: str) -> str:
                 time.sleep(wait_time)
             else:
                 print(f"エラー: 最大試行回数を超えました。: {e}")
-                return paragraph
+                return f"{prefix}{content}\n    - **エラー (API):** {e}"
         except Exception as e:
             print(f"予期しないエラー: {e}")
-            return paragraph
+            return f"{prefix}{content}\n    - **エラー (システム):** {e}"
 
     if not answer:
         return paragraph
@@ -93,9 +93,40 @@ def process_obsidian_notes():
             if not content.strip():
                 print(f"空ファイルのためスキップします: {base_name}")
                 continue
-
+                
+            # 改行コードを統一
             content_normalized = content.replace("\r\n", "\n")
-            paragraphs = content_normalized.split("\n\n")
+            
+            # 【改善】空行がなくても箇条書き記号（- や *、数字など）で自動的に質問を分割する
+            lines = content_normalized.split("\n")
+            paragraphs = []
+            current_para = []
+
+            for line in lines:
+                # 空行の場合は、現在の質問の区切りとして処理
+                if not line.strip():
+                    if current_para:
+                        paragraphs.append("\n".join(current_para))
+                        current_para = []
+                    continue
+                
+                # 行頭が箇条書き記号（- , * , + , 1. など）で始まっているか判定
+                is_bullet = re.match(r"^(\s*[-*+]\s+|\s*\d+\.\s+)", line)
+                
+                if is_bullet:
+                    # すでに前の質問文が溜まっている場合は、それを1つの質問として保存
+                    if current_para:
+                        paragraphs.append("\n".join(current_para))
+                    current_para = [line]
+                else:
+                    # 箇条書き記号がない行（複数行にわたる質問など）は、現在の質問の続きとして結合
+                    if current_para:
+                        current_para.append(line)
+                    else:
+                        current_para = [line]
+            
+            if current_para:
+                paragraphs.append("\n".join(current_para))
             
             new_paragraphs = []
             for para in paragraphs:
@@ -106,23 +137,24 @@ def process_obsidian_notes():
                 else:
                     new_paragraphs.append(para)
                     
-            # 回答を追記した内容を元のファイルに上書き保存
-            new_content = "\n\n".join(new_paragraphs)
-            with open(note_path, "w", encoding="utf-8") as f:
-                f.write(new_content)
-            
-            # 【効率化のポイント】処理済みのフォルダへファイルを移動
-            archive_path = os.path.join(ARCHIVE_FOLDER, base_name)
-            
             # 同名ファイルが移動先にある場合の競合防止（必要に応じてファイル名をユニークに）
+            archive_path = os.path.join(ARCHIVE_FOLDER, base_name)
             if os.path.exists(archive_path):
                 # 重複回避のためタイムスタンプを付与
                 name, ext = os.path.splitext(base_name)
                 timestamp = time.strftime("%Y%m%d_%H%M%S")
                 archive_path = os.path.join(ARCHIVE_FOLDER, f"{name}_{timestamp}{ext}")
 
-            shutil.move(note_path, archive_path)
-            print(f"処理完了（移動先: {os.path.basename(archive_path)}）")
+            # 回答を追記した内容をアーカイブフォルダ（移動先）に直接保存
+            new_content = "\n\n".join(new_paragraphs)
+            with open(archive_path, "w", encoding="utf-8") as f:
+                f.write(new_content)
+            
+            # 元のファイルは消さずに、中身（質問事項）だけを空（白紙）にして上書き保存
+            with open(note_path, "w", encoding="utf-8") as f:
+                f.write("")
+                
+            print(f"処理完了（アーカイブ保存先: {os.path.basename(archive_path)}、元のファイルをクリアしました）")
             
         except Exception as e:
             print(f"ファイル処理中にエラーが発生しました ({note_path}): {e}")
