@@ -1,0 +1,58 @@
+Obsidianの超定番プラグイン 「Templater」 を使うことで、Obsidian自身に搭載されているJavaScriptエンジンから直接Gemini APIを叩き、Vault（保管庫）のファイルを自動的に処理させます。
+導入手順 (3分で完了)
+プラグイン「Templater」のインストール
+Obsidianの左下「設定（歯車マーク）」→「コミュニティプラグイン」を開きます。
+「制限モード」をオフ（有効化）にし、「閲覧」ボタンを押します。
+検索窓に Templater と入力し、インストールして「有効化」します。
+
+テンプレート用ノートの作成
+Obsidian内で新規ノートを作成し、タイトルを「自己組織化システム起動パネル」（任意）にします。
+そのノートの中に、画面上部のエディタ（本Webアプリのファイル選択「Obsidian_Self_Organizer.md」）からJavaScriptコードをすべてコピーしてそのまま貼り付けます。
+貼り付けたコードの最上部付近にある、以下の行を探し、ご自身のGemini APIキーを貼り付けます：
+codeJavaScript
+const GEMINI_API_KEY = "YOUR_GEMINI_API_KEY_HERE"; // ★ここにAPIキーを入力
+
+
+ワンクリック起動！
+作成した「自己組織化システム起動パネル」ノートを開いた状態で、キーボードの Alt + E（Macは Option + E）を押すか、左側ツールバーの「Templaterのアイコン（フォルダに星マーク）」をクリックします。
+画面上部に、以下のメニューポップアップが自動表示されます：
+1: 【F1】質問回答の自動処理 & クレンジング
+2: 【F2】未解決問題の自動プールスキャン
+3: 【F3】キーワード・日常メモから新理論自動生成
+4: 【F4】arXiv論文の自動検索・要約・評価
+5: 【F5】2つの異なる理論の構造的統合 (新機能)
+
+実行したい処理を選択するだけで、裏でフォルダの自動作成、Gemini APIの呼び出し、理論の構築、ファイルの自動保存が完璧に行われます！
+
+
+🛠️ Python版で pip install -r requirements.txt ができない時の解決策
+「やはりローカルのPythonスクリプトでも動かしてみたい」という場合、エラーが起きていた原因は 「コマンドプロンプト上で、ダウンロードしたファイルがあるフォルダ（ディレクトリ）に移動できていないから」 です。
+前回の検索結果から、お使いのPCの C:\Users\user ディレクトリでコマンドを実行しているため、システムが requirements.txt を見つけられずにエラーになっています。
+正しい実行手順
+フォルダの場所（パス）をコピーする
+Windowsのエクスプローラーで、main.py や requirements.txt を保存したフォルダ（例: obsidian_gemini フォルダ）を開きます。
+エクスプローラー上部の「アドレスバー（フォルダ名が並んでいる横の余白部分）」をクリックすると、 C:\Users\user\Documents\obsidian_gemini のようなパスが全選択されるので、それをコピーします。
+
+コマンドプロンプトで移動する
+コマンドプロンプトを開き、 cd と入力した後に半角スペースを1つ空け、コピーしたパスを貼り付けて Enter キーを押します：
+codeBash
+cd C:\Users\user\Documents\obsidian_gemini
+
+画面の左側の表示が C:\Users\user\Documents\obsidian_gemini> に変わっていれば、フォルダの移動に成功しています。
+
+インストールを実行する
+移動した状態で、以下のコマンドを実行します：
+codeBash
+pip install -r requirements.txt
+
+これで正常に必要なライブラリ（google-genai や arxiv 等）がインストールされます！
+
+
+📂 ObsidianのVault（保管庫）フォルダの絶対パスを確認する方法
+Python版の .env ファイルに記述する OBSIDIAN_VAULT_PATH に設定するパスは、以下の手順で一瞬で調べられます。
+Obsidianの左下にある「保管庫の選択（ノートが重なったアイコン）」をクリックします。
+開いた画面に、現在登録されている保管庫（Vault）のリストが表示されます。
+保管庫の名前の下に、薄い文字で表示されているパス（例: C:\Users\user\Documents\MyVault）が、その保管庫の絶対パスです。
+このパスをコピーし、.env ファイルに以下のように記述すれば設定完了です：
+codeEnv
+OBSIDIAN_VAULT_PATH="C:\Users\user\Documents\MyVault"
