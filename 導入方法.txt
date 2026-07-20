@@ -1,0 +1,66 @@
+導入方法
+
+
+スクリプトの配置:
+「🐍 Pythonコード」タブからすべてのファイルをローカルPCの同じフォルダ（例: obsidian_gemini/）にダウンロードします。
+APIキーとVaultパスの設定:
+同じフォルダに .env ファイルを作成し、Google AI StudioのAPIキーと、お使いのObsidianのVaultフォルダのパスを記述します。
+GEMINI_API_KEY="AIzaSy..."
+OBSIDIAN_VAULT_PATH="/Users/name/MyVault"
+実行:
+ターミナルで pip install -r requirements.txt を実行してライブラリを入れた後、
+python main.py
+で起動します。
+
+
+
+
+
+1. デスクトップにフォルダを作成し、ファイルを保存する
+まずは、スクリプトを置くための「専用のフォルダ」をデスクトップに作ります。
+パソコンのデスクトップ上の何もない場所で右クリックし、新規作成 ＞ フォルダー をクリックします。
+フォルダの名前を obsidian_gemini に変更します。
+この Web アプリの右側にある 「🐍 Pythonコード」タブ から、以下のファイルをすべてダウンロードするか、メモ帳等にコピーして、先ほど作った obsidian_gemini フォルダの中に保存してください。
+requirements.txt
+config.py
+parser.py
+gemini_client.py
+arxiv_client.py
+main.py
+.env（APIキーを記述するファイル）
+2. コマンドプロンプトでそのフォルダに「移動」する
+ここが最も重要で、つまづきやすいポイントです。
+画面左下のスタートボタンの横にある検索窓に 「cmd」 または 「コマンドプロンプト」 と入力し、コマンドプロンプトを起動します。
+起動した画面に、まずは半角小文字で cd と入力し、その後に必ず半角スペースを1つ空けます。
+code
+Text
+cd
+(※ cd の後ろにまだEnterキーは押さないでください)
+先ほどデスクトップに作成した obsidian_gemini フォルダを、コマンドプロンプトの黒い画面の中にそのままドラッグ＆ドロップ（マウスで掴んで持っていく） します。
+すると、自動的にフォルダのパスが入力されます。画面が以下のようになっていることを確認してください。
+code
+Text
+C:\Users\user>cd C:\Users\user\Desktop\obsidian_gemini
+この状態で Enterキー を押します。
+左側の表示が以下のように切り替われば、フォルダへの移動は大成功です！
+code
+Text
+C:\Users\user\Desktop\obsidian_gemini>
+3. パッケージのインストールを実行する
+フォルダへの移動が完了した状態で、以下のコマンドをコピーしてコマンドプロンプトに貼り付け、Enterキー を押します。
+code
+Bash
+pip install -r requirements.txt
+💡 もしエラーが出た場合の対処法：
+'pip' は、内部コマンドまたは外部コマンド...として認識されていません。 と表示された場合：
+Pythonが正しくインストールされていないか、環境変数の設定が不足しています。
+その場合は、代わりに以下のコマンドを試してください。
+code
+Bash
+python -m pip install -r requirements.txt
+4. システムを起動する
+インストールが正常に完了したら、いよいよ以下のコマンドを入力してシステムを起動します。
+code
+Bash
+python main.py
+コマンドプロンプト画面にきれいなメニュー（1〜6の選択肢）が表示されれば、ローカルPCでの立ち上げは完了です！
