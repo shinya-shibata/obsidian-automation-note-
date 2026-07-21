@@ -12,6 +12,11 @@ Obsidian内で新規ノートを作成し、タイトルを「自己組織化シ
 codeJavaScript
 const GEMINI_API_KEY = "YOUR_GEMINI_API_KEY_HERE"; // ★ここにAPIキーを入力
 
+ステップ 2：Templaterプラグインにフォルダを登録する（超重要）
+Obsidianの左下の 「歯車マーク（設定）」 を開きます。
+左メニューの「コミュニティプラグイン」から 「Templater」 を選択します。
+最上部にある 「Template folder location（テンプレートフォルダの場所）」 をクリックし、ステップ1でファイルを保存したフォルダ（例: 04_Templates）を指定します。
+
 
 ワンクリック起動！
 作成した「自己組織化システム起動パネル」ノートを開いた状態で、キーボードの Alt + E（Macは Option + E）を押すか、左側ツールバーの「Templaterのアイコン（フォルダに星マーク）」をクリックします。
