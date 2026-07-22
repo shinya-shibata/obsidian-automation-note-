@@ -7,7 +7,7 @@ from google import genai
 from google.genai import types
 from google.genai.errors import APIError
 
-client = genai.Client(api_key="AIzaSyBOqKWkL8bHVbOEKFPWF_VwHrzvogo3M6c")
+client = genai.Client(api_key="your API key")
 
 # 【新しい保存場所の設計】
 # 質問を書き込むフォルダ（処理待ち）
