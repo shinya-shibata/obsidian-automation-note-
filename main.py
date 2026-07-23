@@ -35,13 +35,13 @@ def process_questions():
         print(f"質問処理中: {q_file.name}...")
         try:
             # Geminiで回答生成
-            answer = generate_answer(content, template)
+            answer, model = generate_answer(content, template)
             
             # 回答の書き出し
             ans_file = ANSWERS_DIR / q_file.name
-            ans_content = f"# 質問内容\n\n{content}\n\n---\n\n# Geminiからの回答\n\n{answer}\n"
+            ans_content = f"# 質問内容\n\n{content}\n\n---\n\n# Geminiからの回答\n\n{answer}\n\n---\n*使用したAIモデル: {model}*\n"
             ans_file.write_text(ans_content, encoding="utf-8")
-            print(f"回答を保存しました: {ans_file.name}")
+            print(f"回答を保存しました (使用モデル: {model}): {ans_file.name}")
 
             # 元ファイルのクレンジング (ファイルは残すが中身を空にする)
             q_file.write_text("", encoding="utf-8")
@@ -112,13 +112,13 @@ def generate_theories_from_notes():
     print("Geminiに接続し、新理論を構築中...")
     try:
         # キーワードから最大5つ、メモから最大3つを組み合わせて送信
-        theory = generate_new_theory(all_keywords[:5], all_notes[:3])
+        theory, model = generate_new_theory(all_keywords[:5], all_notes[:3])
         
         timestamp = time.strftime("%Y%m%d_%H%M%S")
         theory_file = BRAINSTORMING_DIR / f"新理論_{timestamp}.md"
-        theory_file.write_text(theory, encoding="utf-8")
+        theory_file.write_text(theory + f"\n\n---\n*使用したAIモデル: {model}*\n", encoding="utf-8")
         
-        print(f"新しい理論が自動生成されました！: {theory_file.name}")
+        print(f"新しい理論が自動生成されました！ (使用モデル: {model}): {theory_file.name}")
     except Exception as e:
         print(f"理論生成エラー: {e}")
 
@@ -170,19 +170,14 @@ def run_arxiv_pipeline():
 
 日本語でロジカルに出力してください。
 """
-        from gemini_client import client, safe_api_call
-        response = safe_api_call(
-            client.models.generate_content,
-            model="gemini-2.5-flash",
-            contents=gemini_prompt
-        )
-        evaluation = response.text
+        from gemini_client import generate_content_with_fallback
+        evaluation, used_model = generate_content_with_fallback(gemini_prompt)
 
         arxiv_content += f"## {idx}. {paper['title']}\n"
         arxiv_content += f"- **著者**: {paper['authors']}\n"
         arxiv_content += f"- **発行年**: {paper['published']}\n"
         arxiv_content += f"- **リンク**: {paper['pdf_url']}\n\n"
-        arxiv_content += f"### Gemini 評価 & 3行サマリー\n\n{evaluation}\n\n"
+        arxiv_content += f"### Gemini 評価 & 3行サマリー (使用モデル: {used_model})\n\n{evaluation}\n\n"
         arxiv_content += "---\n\n"
 
     # 追記または新規作成
@@ -230,13 +225,13 @@ def run_theory_integration_pipeline():
     
     print(f"\nアプローチ「{approach}」を用いてGemini APIで構造的統合思考を実行中...")
     try:
-        integrated_theory = integrate_theories(theory_a, theory_b, approach)
+        integrated_theory, model = integrate_theories(theory_a, theory_b, approach)
         
         timestamp = time.strftime("%Y%m%d_%H%M%S")
         integrated_file = BRAINSTORMING_DIR / f"統合理論_{timestamp}.md"
-        integrated_file.write_text(integrated_theory, encoding="utf-8")
+        integrated_file.write_text(integrated_theory + f"\n\n---\n*使用したAIモデル: {model}*\n", encoding="utf-8")
         
-        print(f"構造的統合理論が創出されました！: {integrated_file.name}")
+        print(f"構造的統合理論が創出されました！ (使用モデル: {model}): {integrated_file.name}")
     except Exception as e:
         print(f"理論統合エラー: {e}")
 
