@@ -61,3 +61,7 @@ Obsidianの左下にある「保管庫の選択（ノートが重なったアイ
 このパスをコピーし、.env ファイルに以下のように記述すれば設定完了です：
 codeEnv
 OBSIDIAN_VAULT_PATH="C:\Users\user\Documents\MyVault"
+
+obsidianの表示を初期化する方法
+以下のコマンドを実行します：
+set OBSIDIAN_VAULT_PATH=C:/Users/user01/Documents/Obsidian Vault && python main.py
