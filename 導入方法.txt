@@ -64,3 +64,7 @@ code
 Bash
 python main.py
 コマンドプロンプト画面にきれいなメニュー（1〜6の選択肢）が表示されれば、ローカルPCでの立ち上げは完了です！
+
+obsidianの表示を初期化する方法
+以下のコマンドを実行します：
+set OBSIDIAN_VAULT_PATH=C:/Users/user01/Documents/Obsidian Vault && python main.py
